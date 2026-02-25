@@ -1,0 +1,1390 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistema Electoral — COED Alejandro de Humboldt</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js"></script>
+<script src="https://unpkg.com/html2canvas@latest/dist/html2canvas.min.js"></script>
+<style>
+:root {
+  --ink:#0D1B2A; --paper:#F5F0E8; --gold:#C8972A; --gold-light:#E8C96A;
+  --red:#8B1A1A; --blue:#1A3A5C; --blue-mid:#2563A8; --cream:#FAF7F0;
+  --border:rgba(200,151,42,0.3); --shadow:0 8px 40px rgba(13,27,42,0.12);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:var(--ink);color:var(--ink);min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:
+  radial-gradient(ellipse 80% 60% at 20% 10%,rgba(200,151,42,0.08) 0%,transparent 60%),
+  radial-gradient(ellipse 60% 80% at 80% 90%,rgba(26,58,92,0.15) 0%,transparent 60%),
+  repeating-linear-gradient(0deg,transparent,transparent 59px,rgba(200,151,42,0.04) 59px,rgba(200,151,42,0.04) 60px),
+  repeating-linear-gradient(90deg,transparent,transparent 59px,rgba(200,151,42,0.04) 59px,rgba(200,151,42,0.04) 60px);
+  pointer-events:none;z-index:0;}
+
+/* SCREENS */
+.screen{display:none;min-height:100vh;position:relative;z-index:1;animation:screenIn 0.5s cubic-bezier(0.16,1,0.3,1) both;}
+.screen.active{display:flex;flex-direction:column;}
+@keyframes screenIn{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
+
+/* HEADER */
+.site-header{background:linear-gradient(135deg,var(--blue) 0%,var(--ink) 100%);border-bottom:2px solid var(--gold);padding:18px 40px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 4px 20px rgba(0,0,0,0.4);}
+.header-brand{display:flex;align-items:center;gap:14px;}
+.header-seal{width:52px;height:52px;background:radial-gradient(circle,var(--gold-light),var(--gold));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.6rem;box-shadow:0 0 0 3px var(--blue),0 0 0 5px var(--gold);}
+.header-title{color:white;}
+.header-title h1{font-family:'Playfair Display',serif;font-size:1.1rem;letter-spacing:0.03em;}
+.header-title p{font-size:0.72rem;color:var(--gold-light);letter-spacing:0.12em;text-transform:uppercase;margin-top:2px;}
+.header-right{display:flex;gap:10px;align-items:center;}
+.header-badge{background:rgba(200,151,42,0.15);border:1px solid var(--gold);color:var(--gold-light);font-size:0.72rem;padding:4px 10px;border-radius:20px;letter-spacing:0.08em;}
+.btn-admin-access{background:transparent;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.5);font-size:0.72rem;padding:5px 12px;border-radius:6px;cursor:pointer;transition:all 0.2s;letter-spacing:0.05em;}
+.btn-admin-access:hover{border-color:var(--gold);color:var(--gold-light);}
+
+/* MAIN CARD */
+.main-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 20px;}
+.card{background:var(--cream);border-radius:20px;border:1px solid var(--border);box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,0.8);width:100%;max-width:680px;overflow:hidden;}
+.card-band{height:6px;background:linear-gradient(90deg,var(--red),var(--gold),var(--blue));}
+.card-inner{padding:44px 48px;}
+@media(max-width:600px){.card-inner{padding:28px 22px;}.site-header{padding:14px 18px;}.header-title h1{font-size:0.9rem;}}
+
+/* TYPOGRAPHY */
+.section-eyebrow{font-size:0.7rem;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
+.section-title{font-family:'Playfair Display',serif;font-size:2rem;color:var(--ink);line-height:1.2;margin-bottom:6px;}
+.section-sub{font-size:0.88rem;color:#555;line-height:1.6;}
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:28px 0;}
+
+/* FORMS */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+@media(max-width:500px){.form-grid{grid-template-columns:1fr;}}
+.form-group{display:flex;flex-direction:column;}
+.form-group.full{grid-column:1/-1;}
+.form-group label{font-size:0.75rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--blue);margin-bottom:6px;}
+.form-group input,.form-group select{padding:11px 14px;border:1.5px solid #D8D2C8;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.9rem;color:var(--ink);background:white;transition:border-color 0.2s,box-shadow 0.2s;appearance:none;}
+.form-group input:focus,.form-group select:focus{outline:none;border-color:var(--blue-mid);box-shadow:0 0 0 3px rgba(37,99,168,0.12);}
+.form-group input::placeholder{color:#aaa;}
+.field-note{font-size:0.72rem;color:#888;margin-top:4px;}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 28px;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:600;cursor:pointer;transition:all 0.25s;letter-spacing:0.02em;}
+.btn-primary{background:linear-gradient(135deg,var(--blue) 0%,var(--blue-mid) 100%);color:white;box-shadow:0 4px 16px rgba(26,58,92,0.3);}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(26,58,92,0.4);}
+.btn-gold{background:linear-gradient(135deg,var(--gold) 0%,var(--gold-light) 100%);color:var(--ink);box-shadow:0 4px 16px rgba(200,151,42,0.3);}
+.btn-gold:hover{transform:translateY(-2px);}
+.btn-outline{background:transparent;border:1.5px solid var(--blue);color:var(--blue);}
+.btn-outline:hover{background:var(--blue);color:white;}
+.btn-danger{background:var(--red);color:white;}
+.btn-danger:hover{background:#6B1212;}
+.btn-green{background:#1A6B3A;color:white;}
+.btn-green:hover{background:#145530;}
+.btn-full{width:100%;}
+.btn-sm{padding:7px 14px;font-size:0.8rem;}
+.btn:disabled{opacity:0.6;cursor:not-allowed;transform:none!important;}
+
+/* MESSAGES */
+.msg{padding:12px 16px;border-radius:8px;font-size:0.88rem;margin:14px 0;display:none;}
+.msg.show{display:block;}
+.msg-error{background:#FDF0F0;border:1px solid #EFC5C5;color:var(--red);}
+.msg-success{background:#EDF7F0;border:1px solid #A8DFBC;color:#1A5C35;}
+.msg-info{background:#EDF3FD;border:1px solid #B0C9EE;color:var(--blue);}
+
+/* STEPS */
+.steps{display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:32px;}
+.step{display:flex;flex-direction:column;align-items:center;gap:6px;position:relative;flex:1;}
+.step::before{content:'';position:absolute;top:15px;left:50%;right:-50%;height:2px;background:#D8D2C8;}
+.step:last-child::before{display:none;}
+.step-circle{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:700;background:#E8E4DC;color:#999;border:2px solid #D8D2C8;position:relative;z-index:1;transition:all 0.3s;}
+.step.done .step-circle{background:var(--blue);color:white;border-color:var(--blue);}
+.step.active .step-circle{background:var(--gold);color:var(--ink);border-color:var(--gold);box-shadow:0 0 0 4px rgba(200,151,42,0.2);}
+.step-label{font-size:0.68rem;color:#888;text-align:center;font-weight:500;}
+.step.active .step-label{color:var(--gold);font-weight:600;}
+.step.done .step-label{color:var(--blue);}
+
+/* CANDIDATES */
+.candidates-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:16px;margin:20px 0;}
+.candidate-card{border:2px solid #D8D2C8;border-radius:14px;padding:20px 16px;text-align:center;cursor:pointer;transition:all 0.25s;background:white;position:relative;overflow:hidden;}
+.candidate-card:hover{border-color:var(--blue-mid);transform:translateY(-3px);box-shadow:0 8px 24px rgba(26,58,92,0.15);}
+.candidate-card.selected{border-color:var(--blue);background:var(--blue);}
+.candidate-card.selected *{color:white!important;}
+.candidate-card.selected .candidate-img-wrap{border-color:rgba(255,255,255,0.4);}
+.candidate-img-wrap{width:80px;height:80px;border-radius:50%;margin:0 auto 12px;overflow:hidden;border:3px solid #E8E4DC;background:linear-gradient(135deg,#E8E8F0,#D0D8E8);display:flex;align-items:center;justify-content:center;}
+.candidate-img-wrap img{width:100%;height:100%;object-fit:cover;}
+.candidate-img-placeholder{font-size:2rem;}
+.candidate-name{font-weight:700;font-size:0.92rem;color:var(--ink);margin-bottom:4px;}
+.candidate-detail{font-size:0.76rem;color:#666;}
+.candidate-votes{font-size:0.78rem;font-weight:600;color:var(--blue-mid);margin-top:6px;padding-top:6px;border-top:1px solid #E8E4DC;}
+.candidate-card.selected .candidate-votes{color:rgba(255,255,255,0.7)!important;border-top-color:rgba(255,255,255,0.2)!important;}
+.candidate-check{position:absolute;top:10px;right:10px;width:22px;height:22px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:0.7rem;color:white;opacity:0;transition:opacity 0.2s;}
+.candidate-card.selected .candidate-check{opacity:1;}
+
+/* RECEIPT */
+.receipt{background:white;border:1px solid var(--border);border-radius:12px;padding:24px;margin:20px 0;}
+.receipt-header{display:flex;align-items:center;gap:12px;padding-bottom:14px;border-bottom:1px dashed var(--border);margin-bottom:14px;}
+.receipt-icon{font-size:1.8rem;}
+.receipt-title{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--ink);}
+.receipt-sub{font-size:0.78rem;color:#777;}
+.receipt-row{display:flex;justify-content:space-between;margin-bottom:8px;}
+.receipt-label{font-size:0.8rem;color:#888;}
+.receipt-value{font-size:0.85rem;font-weight:600;color:var(--ink);text-align:right;max-width:60%;}
+.receipt-candidate{background:linear-gradient(135deg,var(--blue),var(--blue-mid));color:white;border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px;margin:14px 0;}
+.receipt-candidate-img{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,0.2);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;}
+.receipt-candidate-img img{width:100%;height:100%;object-fit:cover;}
+.receipt-candidate-name{font-weight:700;font-size:0.95rem;}
+.receipt-candidate-sub{font-size:0.78rem;opacity:0.8;margin-top:2px;}
+
+/* SUCCESS */
+.success-anim{text-align:center;padding:20px 0;}
+.success-circle{width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,#1A5C35,#28A745);display:flex;align-items:center;justify-content:center;font-size:2.5rem;margin:0 auto 20px;box-shadow:0 0 0 10px rgba(40,167,69,0.1),0 0 0 20px rgba(40,167,69,0.05);animation:popIn 0.5s cubic-bezier(0.34,1.56,0.64,1) 0.1s both;}
+@keyframes popIn{from{transform:scale(0);opacity:0;}to{transform:scale(1);opacity:1;}}
+.success-title{font-family:'Playfair Display',serif;font-size:1.6rem;color:#1A5C35;margin-bottom:8px;}
+.success-sub{font-size:0.9rem;color:#555;line-height:1.6;}
+.vote-id-badge{display:inline-block;background:#EDF7F0;border:1px solid #A8DFBC;color:#1A5C35;padding:6px 16px;border-radius:20px;font-weight:700;font-size:0.82rem;letter-spacing:0.1em;margin:12px 0;}
+.pdf-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px;}
+
+/* PDF TEMPLATE */
+#pdf-receipt-tpl{position:fixed;left:-9999px;top:0;width:595px;font-family:'DM Sans',sans-serif;background:white;padding:40px;color:#0D1B2A;}
+.pdf-header{display:flex;align-items:center;gap:16px;margin-bottom:28px;padding-bottom:18px;border-bottom:3px solid #C8972A;}
+.pdf-seal{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#C8972A,#E8C96A);display:flex;align-items:center;justify-content:center;font-size:2rem;flex-shrink:0;}
+.pdf-school{font-size:0.7rem;color:#888;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:2px;}
+.pdf-title{font-family:serif;font-size:1.4rem;color:#0D1B2A;font-weight:700;}
+.pdf-doc-title{font-size:1.1rem;color:#1A3A5C;font-weight:700;margin-bottom:20px;text-align:center;}
+.pdf-section{margin-bottom:18px;}
+.pdf-section-title{font-size:0.68rem;text-transform:uppercase;letter-spacing:0.1em;color:#C8972A;font-weight:700;margin-bottom:8px;}
+.pdf-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #F0EDE6;}
+.pdf-label{font-size:0.82rem;color:#666;}
+.pdf-value{font-size:0.85rem;font-weight:600;color:#0D1B2A;}
+.pdf-candidate-box{background:linear-gradient(135deg,#1A3A5C,#2563A8);color:white;border-radius:10px;padding:16px;display:flex;align-items:center;gap:14px;margin:12px 0;}
+.pdf-cand-img{width:50px;height:50px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;overflow:hidden;}
+.pdf-cand-img img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+.pdf-cand-name{font-size:1rem;font-weight:700;}
+.pdf-cand-detail{font-size:0.78rem;opacity:0.8;margin-top:2px;}
+.pdf-stamp{text-align:center;margin-top:24px;padding-top:18px;border-top:1px dashed #D8D2C8;}
+.pdf-stamp-circle{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;width:100px;height:100px;border-radius:50%;border:3px solid #C8972A;color:#C8972A;padding:8px;}
+.pdf-stamp-text{font-size:0.62rem;text-transform:uppercase;letter-spacing:0.12em;font-weight:700;text-align:center;line-height:1.3;}
+.pdf-folio{font-size:0.7rem;color:#aaa;margin-top:8px;}
+
+/* ADMIN OVERLAY */
+#admin-overlay{display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);align-items:flex-start;justify-content:center;padding:16px;overflow-y:auto;}
+#admin-overlay.open{display:flex;}
+.admin-panel{background:var(--ink);border:1px solid var(--gold);border-radius:20px;width:100%;max-width:1100px;box-shadow:0 20px 60px rgba(0,0,0,0.5);overflow:hidden;margin:auto;}
+.admin-header{background:linear-gradient(135deg,var(--blue),var(--ink));border-bottom:1px solid var(--gold);padding:22px 30px;display:flex;align-items:center;justify-content:space-between;}
+.admin-header-left{display:flex;align-items:center;gap:12px;}
+.admin-icon{font-size:1.6rem;}
+.admin-title{font-family:'Playfair Display',serif;font-size:1.3rem;color:white;}
+.admin-sub{font-size:0.76rem;color:var(--gold-light);letter-spacing:0.08em;}
+.btn-close-admin{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.6);width:36px;height:36px;border-radius:8px;cursor:pointer;font-size:1rem;transition:all 0.2s;}
+.btn-close-admin:hover{background:var(--red);color:white;border-color:var(--red);}
+.admin-body{padding:24px 30px;}
+
+/* ADMIN TABS */
+.admin-tabs{display:flex;gap:6px;margin-bottom:22px;flex-wrap:wrap;}
+.admin-tab{padding:8px 16px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:transparent;color:rgba(255,255,255,0.5);font-size:0.82rem;cursor:pointer;transition:all 0.2s;font-family:'DM Sans',sans-serif;}
+.admin-tab.active{background:var(--gold);color:var(--ink);border-color:var(--gold);font-weight:600;}
+.admin-tab:hover:not(.active){border-color:rgba(255,255,255,0.3);color:white;}
+.admin-section{display:none;}
+.admin-section.active{display:block;}
+
+/* ADMIN TABLE */
+.admin-table-wrap{overflow-x:auto;border-radius:10px;border:1px solid rgba(255,255,255,0.08);}
+.admin-table{width:100%;border-collapse:collapse;}
+.admin-table th{background:rgba(200,151,42,0.15);color:var(--gold-light);font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;padding:12px 14px;text-align:left;white-space:nowrap;}
+.admin-table td{padding:10px 14px;border-bottom:1px solid rgba(255,255,255,0.05);color:rgba(255,255,255,0.85);font-size:0.83rem;}
+.admin-table tr:last-child td{border-bottom:none;}
+.admin-table tr:hover td{background:rgba(255,255,255,0.03);}
+.voted-badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:0.72rem;font-weight:600;}
+.voted-yes{background:rgba(40,167,69,0.2);color:#6FCF97;}
+
+/* ADMIN STATS */
+.admin-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px;}
+.admin-stat{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px;text-align:center;}
+.admin-stat-val{font-size:1.8rem;font-weight:700;color:var(--gold);font-family:'Playfair Display',serif;}
+.admin-stat-lbl{font-size:0.74rem;color:rgba(255,255,255,0.5);margin-top:4px;}
+
+/* CANDIDATE ADMIN CARDS */
+.cand-admin-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px;margin-bottom:20px;}
+.cand-admin-card{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:18px;text-align:center;position:relative;}
+.cand-admin-img{width:68px;height:68px;border-radius:50%;margin:0 auto 10px;background:rgba(255,255,255,0.1);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:1.8rem;border:2px solid rgba(200,151,42,0.3);}
+.cand-admin-img img{width:100%;height:100%;object-fit:cover;}
+.cand-admin-name{font-weight:600;color:white;font-size:0.88rem;margin-bottom:4px;}
+.cand-admin-detail{font-size:0.74rem;color:rgba(255,255,255,0.5);}
+.cand-admin-votes{font-size:1.1rem;font-weight:700;color:var(--gold);margin-top:8px;}
+.cand-admin-votes-label{font-size:0.68rem;color:rgba(255,255,255,0.35);}
+
+/* ADMIN FORMS */
+.admin-form{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;}
+.admin-form-group{display:flex;flex-direction:column;gap:5px;}
+.admin-form-group.full{grid-column:1/-1;}
+.admin-form-group label{font-size:0.73rem;color:var(--gold-light);letter-spacing:0.08em;text-transform:uppercase;}
+.admin-form-group input,.admin-form-group select,.admin-form-group textarea{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:white;padding:9px 11px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.86rem;}
+.admin-form-group input:focus,.admin-form-group select:focus,.admin-form-group textarea:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(200,151,42,0.15);}
+.admin-form-group input::placeholder,.admin-form-group textarea::placeholder{color:rgba(255,255,255,0.25);}
+.admin-form-group select option{background:#1A3A5C;}
+
+/* RESULTS CHART */
+.result-bar-wrap{margin:10px 0;}
+.result-bar-info{display:flex;justify-content:space-between;margin-bottom:4px;align-items:center;}
+.result-bar-rank{width:22px;height:22px;border-radius:50%;background:rgba(200,151,42,0.2);color:var(--gold);font-size:0.72rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.result-bar-rank.first{background:var(--gold);color:var(--ink);}
+.result-bar-name{font-size:0.85rem;color:rgba(255,255,255,0.9);font-weight:600;flex:1;margin:0 10px;}
+.result-bar-count{font-size:0.82rem;color:var(--gold);font-weight:700;white-space:nowrap;}
+.result-bar-track{height:10px;background:rgba(255,255,255,0.08);border-radius:10px;overflow:hidden;}
+.result-bar-fill{height:100%;background:linear-gradient(90deg,var(--blue-mid),var(--gold));border-radius:10px;transition:width 0.9s cubic-bezier(0.16,1,0.3,1);}
+.result-bar-fill.first{background:linear-gradient(90deg,var(--gold),var(--gold-light));}
+.winner-banner{background:linear-gradient(135deg,rgba(200,151,42,0.15),rgba(200,151,42,0.05));border:1px solid var(--gold);border-radius:12px;padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;gap:14px;}
+.winner-crown{font-size:2rem;}
+.winner-info-label{font-size:0.7rem;color:var(--gold-light);letter-spacing:0.1em;text-transform:uppercase;}
+.winner-info-name{font-size:1.1rem;font-weight:700;color:white;margin-top:2px;}
+.winner-info-sub{font-size:0.78rem;color:rgba(255,255,255,0.5);margin-top:2px;}
+
+/* FILTER BAR */
+.filter-bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px;}
+.filter-select{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:white;padding:8px 12px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.83rem;cursor:pointer;}
+.filter-select option{background:#1A3A5C;}
+.filter-search{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:white;padding:8px 14px;border-radius:8px;font-size:0.83rem;font-family:'DM Sans',sans-serif;flex:1;min-width:180px;}
+.filter-search::placeholder{color:rgba(255,255,255,0.3);}
+.filter-search:focus,.filter-select:focus{outline:none;border-color:var(--gold);}
+.filter-count{font-size:0.78rem;color:rgba(255,255,255,0.4);white-space:nowrap;}
+
+/* SECCIONES ADMIN */
+.secciones-list{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;}
+.seccion-tag{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.8);padding:5px 12px;border-radius:20px;font-size:0.8rem;display:flex;align-items:center;gap:6px;}
+.seccion-tag-del{background:none;border:none;color:rgba(255,100,100,0.6);cursor:pointer;font-size:0.75rem;padding:0;line-height:1;transition:color 0.2s;}
+.seccion-tag-del:hover{color:#F4A4A4;}
+.seccion-group-title{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--gold-light);font-weight:600;margin:12px 0 8px;grid-column:1/-1;}
+.seccion-add-row{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;}
+
+/* PASSWORD SCREEN */
+.pw-overlay{display:none;position:fixed;inset:0;z-index:900;background:rgba(0,0,0,0.8);backdrop-filter:blur(4px);align-items:center;justify-content:center;}
+.pw-overlay.open{display:flex;}
+.pw-card{background:rgba(245,240,232,0.05);backdrop-filter:blur(10px);border:1px solid rgba(200,151,42,0.3);border-radius:20px;padding:44px 48px;text-align:center;width:100%;max-width:400px;}
+.pw-icon{font-size:3rem;margin-bottom:16px;}
+.pw-title{font-family:'Playfair Display',serif;font-size:1.6rem;color:white;margin-bottom:6px;}
+.pw-sub{font-size:0.85rem;color:rgba(255,255,255,0.5);margin-bottom:28px;}
+.pw-input{width:100%;padding:13px 16px;background:rgba(255,255,255,0.08);border:1.5px solid rgba(200,151,42,0.3);border-radius:10px;color:white;font-size:1rem;text-align:center;letter-spacing:0.15em;font-family:'DM Sans',sans-serif;margin-bottom:14px;}
+.pw-input:focus{outline:none;border-color:var(--gold);}
+.pw-input::placeholder{letter-spacing:0.02em;color:rgba(255,255,255,0.3);}
+.pw-error{color:#F4A4A4;font-size:0.82rem;margin-bottom:10px;display:none;}
+.pw-error.show{display:block;}
+
+/* UTILITY */
+.spinner{display:inline-block;width:18px;height:18px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 0.7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.empty-state{text-align:center;padding:40px 20px;}
+.empty-icon{font-size:3rem;margin-bottom:12px;opacity:0.4;}
+.empty-text{font-size:0.9rem;color:rgba(255,255,255,0.4);}
+.sec-divider{height:1px;background:rgba(255,255,255,0.07);margin:20px 0;}
+.btn-del{background:rgba(139,26,26,0.3);border:none;color:#F4A4A4;width:26px;height:26px;border-radius:6px;cursor:pointer;font-size:0.75rem;transition:all 0.2s;position:absolute;top:8px;right:8px;}
+.btn-del:hover{background:var(--red);color:white;}
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:rgba(200,151,42,0.3);border-radius:3px;}
+
+/* ─── SECCIONES QUICK-ADD UI ─── */
+.sec-quickadd-wrap{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:18px 20px;margin-bottom:4px;}
+.sec-qa-label{font-size:0.72rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--gold-light);font-weight:600;margin-bottom:12px;}
+.sec-qa-group-row{margin-bottom:10px;}
+.sec-qa-group-btns{display:flex;flex-wrap:wrap;gap:6px;}
+.sec-qa-group-btn{padding:5px 13px;border-radius:20px;border:1px solid rgba(255,255,255,0.12);background:transparent;color:rgba(255,255,255,0.5);font-size:0.76rem;cursor:pointer;transition:all 0.18s;font-family:'DM Sans',sans-serif;}
+.sec-qa-group-btn:hover,.sec-qa-group-btn.sel{background:var(--gold);color:var(--ink);border-color:var(--gold);font-weight:600;}
+.sec-qa-input-row{display:flex;gap:8px;align-items:center;margin-bottom:10px;}
+.sec-qa-input{background:rgba(255,255,255,0.07);border:1.5px solid rgba(255,255,255,0.15);color:white;padding:10px 14px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.9rem;flex:1;transition:border-color 0.2s;}
+.sec-qa-input:focus{outline:none;border-color:var(--gold);}
+.sec-qa-input::placeholder{color:rgba(255,255,255,0.3);}
+.sec-qa-btn{border-radius:10px!important;padding:10px 20px!important;font-size:1.1rem!important;line-height:1;}
+.sec-qa-preview{background:rgba(200,151,42,0.15);border:1px solid var(--gold);color:var(--gold-light);font-size:0.78rem;padding:5px 10px;border-radius:8px;white-space:nowrap;}
+.sec-batch-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center;}
+.sec-batch-label{font-size:0.74rem;color:rgba(255,255,255,0.4);margin-right:4px;}
+.sec-batch-btn{padding:5px 12px;border-radius:8px;border:1px dashed rgba(200,151,42,0.35);background:transparent;color:rgba(200,151,42,0.65);font-size:0.76rem;cursor:pointer;transition:all 0.18s;font-family:'DM Sans',sans-serif;}
+.sec-batch-btn:hover{background:rgba(200,151,42,0.12);color:var(--gold);border-color:var(--gold);}
+.sec-board-header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;}
+.sec-total-badge{background:rgba(200,151,42,0.12);border:1px solid rgba(200,151,42,0.25);color:var(--gold-light);font-size:0.72rem;padding:3px 10px;border-radius:12px;font-weight:600;}
+.sec-group-block{margin-bottom:16px;}
+.sec-group-title{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.38);font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+.sec-group-title::after{content:'';flex:1;height:1px;background:rgba(255,255,255,0.06);}
+.sec-chips{display:flex;flex-wrap:wrap;gap:6px;}
+.sec-chip{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.82);padding:5px 10px 5px 13px;border-radius:20px;font-size:0.8rem;transition:all 0.15s;}
+.sec-chip:hover{border-color:rgba(255,100,100,0.4);background:rgba(255,60,60,0.07);}
+.sec-chip-del{background:none;border:none;color:rgba(255,100,100,0.45);cursor:pointer;font-size:0.7rem;padding:0;line-height:1;width:15px;height:15px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:all 0.15s;}
+.sec-chip-del:hover{background:rgba(255,50,50,0.2);color:#F4A4A4;}
+</style>
+</head>
+<body>
+
+<!-- ========== VOTING SCREEN ========== -->
+<div class="screen active" id="screen-main">
+  <header class="site-header">
+    <div class="header-brand">
+      <div class="header-seal">🏫</div>
+      <div class="header-title">
+        <h1>COED Alejandro de Humboldt</h1>
+        <p>Proceso Electoral Estudiantil — CDE 2025</p>
+      </div>
+    </div>
+    <div class="header-right">
+      <span class="header-badge" id="header-badge">⚡ Votación en curso</span>
+      <button class="btn-admin-access" onclick="openAdminLogin()">⚙ Admin</button>
+    </div>
+  </header>
+
+  <div class="main-wrap">
+    <div class="card">
+      <div class="card-band"></div>
+      <div class="card-inner">
+        <!-- Steps -->
+        <div class="steps">
+          <div class="step active" id="step1"><div class="step-circle">1</div><span class="step-label">Registro</span></div>
+          <div class="step" id="step2"><div class="step-circle">2</div><span class="step-label">Candidatos</span></div>
+          <div class="step" id="step3"><div class="step-circle">3</div><span class="step-label">Confirmar</span></div>
+          <div class="step" id="step4"><div class="step-circle">4</div><span class="step-label">Comprobante</span></div>
+        </div>
+
+        <!-- PASO 1 -->
+        <div id="paso1">
+          <div class="section-eyebrow">Paso 1 de 4</div>
+          <div class="section-title">Identifícate para votar</div>
+          <div class="section-sub">Ingresa tus datos. Solo podrás emitir un voto por proceso electoral.</div>
+          <div class="divider"></div>
+          <form id="form-registro" onsubmit="submitRegistro(event)">
+            <div class="form-grid">
+              <div class="form-group full">
+                <label for="nombre_completo">Nombre Completo *</label>
+                <input type="text" id="nombre_completo" placeholder="Nombres y apellidos completos" required autocomplete="off">
+              </div>
+              <div class="form-group">
+                <label for="seccion">Sección / Año *</label>
+                <select id="seccion" required>
+                  <option value="">— Seleccionar —</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="nie">NIE *</label>
+                <input type="text" id="nie" placeholder="Número de Identificación" required autocomplete="off">
+                <span class="field-note">Solo puedes votar una vez por NIE</span>
+              </div>
+              <div class="form-group full">
+                <label for="correo">Correo Institucional *</label>
+                <input type="email" id="correo" placeholder="usuario@clases.edu.sv" required autocomplete="off">
+                <span class="field-note">Debe ser tu correo @clases.edu.sv</span>
+              </div>
+            </div>
+            <div id="msg-registro" class="msg"></div>
+            <button type="submit" class="btn btn-primary btn-full" id="btn-registro">Continuar a Candidatos →</button>
+          </form>
+        </div>
+
+        <!-- PASO 2 -->
+        <div id="paso2" style="display:none">
+          <div class="section-eyebrow">Paso 2 de 4</div>
+          <div class="section-title">Elige tu candidato</div>
+          <div class="section-sub">Selecciona <strong>un candidato</strong> para representante del CDE sector alumnos.</div>
+          <div class="divider"></div>
+          <div class="candidates-grid" id="candidates-grid"></div>
+          <div id="msg-candidatos" class="msg"></div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;">
+            <button class="btn btn-outline" onclick="backToPaso1()">← Atrás</button>
+            <button class="btn btn-primary" onclick="irAConfirmar()" style="flex:1">Revisar y Confirmar →</button>
+          </div>
+        </div>
+
+        <!-- PASO 3 -->
+        <div id="paso3" style="display:none">
+          <div class="section-eyebrow">Paso 3 de 4</div>
+          <div class="section-title">Confirma tu voto</div>
+          <div class="section-sub">Esta acción es <strong>irreversible</strong>. Verifica tu elección antes de confirmar.</div>
+          <div class="divider"></div>
+          <div class="receipt" id="confirm-receipt"></div>
+          <div id="msg-confirmar" class="msg"></div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;">
+            <button class="btn btn-outline" onclick="backToPaso2()">← Cambiar voto</button>
+            <button class="btn btn-gold" onclick="confirmarVoto()" id="btn-confirmar" style="flex:1">✓ Confirmar voto definitivo</button>
+          </div>
+        </div>
+
+        <!-- PASO 4 -->
+        <div id="paso4" style="display:none">
+          <div class="success-anim">
+            <div class="success-circle">✓</div>
+            <div class="success-title">¡Voto registrado!</div>
+            <div class="success-sub">Tu participación democrática ha sido registrada exitosamente.</div>
+            <div class="vote-id-badge" id="vote-folio"></div>
+            <div class="success-sub" style="margin-top:8px">Descarga tu comprobante de votación.</div>
+          </div>
+          <div id="receipt-preview"></div>
+          <div class="pdf-actions">
+            <button class="btn btn-primary" onclick="generarPDF()" id="btn-pdf">⬇ Descargar comprobante PDF</button>
+            <button class="btn btn-outline" onclick="nuevoVoto()">Nuevo votante</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== ADMIN LOGIN ========== -->
+<div class="pw-overlay" id="admin-login-overlay">
+  <div class="pw-card">
+    <div class="pw-icon">🔐</div>
+    <div class="pw-title">Acceso Administrativo</div>
+    <div class="pw-sub">Ingresa la contraseña de administrador para continuar</div>
+    <div class="pw-error" id="pw-error">Contraseña incorrecta. Intenta nuevamente.</div>
+    <input type="password" class="pw-input" id="pw-input" placeholder="Contraseña de acceso">
+    <button class="btn btn-gold btn-full" onclick="checkPassword()">Ingresar al Panel →</button>
+    <button class="btn btn-full" style="margin-top:10px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.4);" onclick="closeAdminLogin()">Cancelar</button>
+  </div>
+</div>
+
+<!-- ========== ADMIN PANEL ========== -->
+<div id="admin-overlay">
+  <div class="admin-panel">
+    <div class="admin-header">
+      <div class="admin-header-left">
+        <span class="admin-icon">⚙️</span>
+        <div>
+          <div class="admin-title">Panel de Administración</div>
+          <div class="admin-sub">COED Alejandro de Humboldt — Sistema Electoral CDE 2025</div>
+        </div>
+      </div>
+      <button class="btn-close-admin" onclick="closeAdmin()">✕</button>
+    </div>
+
+    <div class="admin-body">
+      <div class="admin-tabs">
+        <button class="admin-tab active" onclick="switchTab('tab-resumen',this)">📊 Resumen</button>
+        <button class="admin-tab" onclick="switchTab('tab-votantes',this)">👥 Votantes</button>
+        <button class="admin-tab" onclick="switchTab('tab-candidatos',this)">🏅 Candidatos</button>
+        <button class="admin-tab" onclick="switchTab('tab-resultados',this)">📈 Resultados</button>
+        <button class="admin-tab" onclick="switchTab('tab-secciones',this)">📋 Secciones</button>
+      </div>
+
+      <!-- TAB RESUMEN -->
+      <div class="admin-section active" id="tab-resumen">
+        <div class="admin-stats" id="admin-stats-grid"></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;">
+          <button class="btn btn-gold btn-sm" onclick="exportarCSV()">⬇ Exportar votantes CSV</button>
+          <button class="btn btn-sm" style="background:rgba(255,255,255,0.08);color:white;" onclick="renderAdminData()">↻ Actualizar datos</button>
+        </div>
+        <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:16px 18px;">
+          <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.4);margin-bottom:10px;font-weight:600;">🔗 Conexión Google Sheets</div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <input type="url" id="sheets-url-input" placeholder="URL del Web App de Apps Script…"
+              style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:white;padding:9px 12px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.83rem;flex:1;min-width:220px;">
+            <button class="btn btn-gold btn-sm" onclick="guardarSheetsURL()">💾 Guardar</button>
+            <button class="btn btn-sm" style="background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.6);" onclick="testSheetsConnection()">🔗 Probar</button>
+          </div>
+          <div id="msg-sheets" class="msg" style="margin-top:8px;margin-bottom:0;"></div>
+          <div style="margin-top:8px;font-size:0.74rem;color:rgba(255,255,255,0.3);">Pega aquí la URL que obtienes al implementar el archivo .gs como aplicación web en Google Apps Script.</div>
+        </div>
+      </div>
+
+      <!-- TAB VOTANTES -->
+      <div class="admin-section" id="tab-votantes">
+        <div class="filter-bar">
+          <input class="filter-search" id="v-search" placeholder="Buscar por nombre, NIE o correo..." oninput="applyVoterFilter()">
+          <select class="filter-select" id="v-filter-seccion" onchange="applyVoterFilter()">
+            <option value="">Todas las secciones</option>
+          </select>
+          <select class="filter-select" id="v-filter-cand" onchange="applyVoterFilter()">
+            <option value="">Todos los candidatos</option>
+          </select>
+          <span class="filter-count" id="v-count"></span>
+        </div>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>#</th><th>Nombre Completo</th><th>Sección/Año</th><th>NIE</th>
+                <th>Correo</th><th>Candidato Votado</th><th>Fecha/Hora</th><th>Estado</th><th>Acción</th>
+              </tr>
+            </thead>
+            <tbody id="admin-voters-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB CANDIDATOS -->
+      <div class="admin-section" id="tab-candidatos">
+        <div class="cand-admin-grid" id="cand-admin-grid"></div>
+        <div class="sec-divider"></div>
+        <div style="color:var(--gold-light);font-size:0.78rem;text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:12px;">➕ Agregar nuevo candidato</div>
+        <div class="admin-form">
+          <div class="admin-form-group"><label>Nombre completo *</label><input type="text" id="cand-nombre" placeholder="Nombre del candidato"></div>
+          <div class="admin-form-group"><label>Propuesta / Lema</label><input type="text" id="cand-lema" placeholder="Breve propuesta o lema"></div>
+          <div class="admin-form-group full"><label>URL de foto (opcional)</label><input type="url" id="cand-foto" placeholder="https://... enlace directo a imagen pública"></div>
+        </div>
+        <div style="margin-top:14px;display:flex;gap:10px;">
+          <button class="btn btn-gold btn-sm" onclick="agregarCandidato()">+ Agregar candidato</button>
+        </div>
+        <div id="msg-cand-admin" class="msg" style="margin-top:12px;"></div>
+      </div>
+
+      <!-- TAB RESULTADOS -->
+      <div class="admin-section" id="tab-resultados">
+        <div id="winner-banner-wrap"></div>
+        <div id="results-chart"></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;">
+          <button class="btn btn-gold btn-sm" onclick="exportarResultadosPDF()">⬇ Exportar resultados PDF</button>
+          <button class="btn btn-sm" style="background:rgba(255,255,255,0.08);color:white;" onclick="renderResults()">↻ Actualizar</button>
+        </div>
+      </div>
+
+      <!-- TAB SECCIONES -->
+      <div class="admin-section" id="tab-secciones">
+        <div class="sec-quickadd-wrap">
+          <div class="sec-qa-label">Selecciona el grupo y escribe la sección</div>
+          <div class="sec-qa-group-row">
+            <div class="sec-qa-group-btns" id="sec-qa-group-btns"></div>
+          </div>
+          <div class="sec-qa-input-row">
+            <input type="text" id="nueva-seccion" class="sec-qa-input" placeholder="Ej: 4-1, Técnico A, 10°…" autocomplete="off"
+              oninput="livePreviewSeccion(this.value)"
+              onkeydown="if(event.key==='Enter'){event.preventDefault();quickAddSeccion();}">
+            <div class="sec-qa-preview" id="sec-qa-preview" style="display:none"></div>
+            <button class="btn btn-gold btn-sm sec-qa-btn" onclick="quickAddSeccion()">+</button>
+          </div>
+          <div class="sec-batch-row">
+            <span class="sec-batch-label">Agregar en lote:</span>
+            <button class="sec-batch-btn" onclick="batchAdd('Básica — 3er Ciclo',['7°','8°','9°'])">7° → 9°</button>
+            <button class="sec-batch-btn" onclick="batchAddRange('Bachillerato — 1er Año','1-',1,16)">1-1 → 1-16</button>
+            <button class="sec-batch-btn" onclick="batchAddRange('Bachillerato — 2do Año','2-',1,14)">2-1 → 2-14</button>
+            <button class="sec-batch-btn" onclick="batchAddRange('Bachillerato — 3er Año','3-',1,8)">3-1 → 3-8</button>
+          </div>
+        </div>
+        <div class="sec-divider"></div>
+        <div class="sec-board-header">
+          <span style="color:rgba(255,255,255,0.65);font-size:0.82rem;">Secciones activas — clic en ✕ para eliminar</span>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <span id="sec-total-badge" class="sec-total-badge">0 secciones</span>
+            <button class="btn btn-sm" style="background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.45);font-size:0.75rem;padding:5px 10px;" onclick="resetSecciones()">↺ Restaurar por defecto</button>
+          </div>
+        </div>
+        <div id="secciones-display"></div>
+        <div id="msg-secciones" class="msg" style="margin-top:10px;"></div>
+      </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ========== PDF TEMPLATE ========== -->
+<div id="pdf-receipt-tpl">
+  <div class="pdf-header">
+    <div class="pdf-seal">🏫</div>
+    <div>
+      <div class="pdf-school">Centro Escolar Oficial Diurno</div>
+      <div class="pdf-title">COED Alejandro de Humboldt</div>
+    </div>
+  </div>
+  <div class="pdf-doc-title">Comprobante de Votación — CDE Sector Alumnos</div>
+  <div class="pdf-section">
+    <div class="pdf-section-title">Datos del Votante</div>
+    <div class="pdf-row"><span class="pdf-label">Nombre completo</span><span class="pdf-value" id="pdf-nombre">—</span></div>
+    <div class="pdf-row"><span class="pdf-label">Sección / Año</span><span class="pdf-value" id="pdf-seccion">—</span></div>
+    <div class="pdf-row"><span class="pdf-label">NIE</span><span class="pdf-value" id="pdf-nie">—</span></div>
+    <div class="pdf-row"><span class="pdf-label">Correo institucional</span><span class="pdf-value" id="pdf-correo">—</span></div>
+    <div class="pdf-row"><span class="pdf-label">Fecha y hora del voto</span><span class="pdf-value" id="pdf-fecha">—</span></div>
+  </div>
+  <div class="pdf-section">
+    <div class="pdf-section-title">Candidato Elegido</div>
+    <div class="pdf-candidate-box">
+      <div class="pdf-cand-img" id="pdf-cand-img">🧑</div>
+      <div>
+        <div class="pdf-cand-name" id="pdf-cand-nombre">—</div>
+        <div class="pdf-cand-detail" id="pdf-cand-lema">—</div>
+      </div>
+    </div>
+  </div>
+  <div class="pdf-stamp">
+    <div class="pdf-stamp-circle"><div class="pdf-stamp-text">VOTO<br>VÁLIDO<br>✓</div></div>
+    <div class="pdf-folio" id="pdf-folio">Folio: —</div>
+    <div style="font-size:0.68rem;color:#aaa;margin-top:4px;">Este comprobante certifica tu participación democrática</div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+//  CONSTANTES
+// ═══════════════════════════════════════════════════════════════
+const ADMIN_PASSWORD  = 'COEDAH2026';
+const EMAIL_DOMAIN    = '@clases.edu.sv';
+
+const DEFAULT_SECCIONES = [
+  { grupo:'Básica — 3er Ciclo',  nombre:'7°' },
+  { grupo:'Básica — 3er Ciclo',  nombre:'8°' },
+  { grupo:'Básica — 3er Ciclo',  nombre:'9°' },
+  ...[...Array(16)].map((_,i)=>({ grupo:'Bachillerato — 1er Año', nombre:`1-${i+1}` })),
+  ...[...Array(14)].map((_,i)=>({ grupo:'Bachillerato — 2do Año', nombre:`2-${i+1}` })),
+  ...[...Array(8)].map((_,i)=>({ grupo:'Bachillerato — 3er Año',  nombre:`3-${i+1}` })),
+];
+
+// ═══════════════════════════════════════════════════════════════
+//  ESTADO
+// ═══════════════════════════════════════════════════════════════
+let currentVoter    = null;
+let selectedCand    = null;
+let voters          = [];
+let candidates      = [];
+let secciones       = [];
+let sheetsURL       = '';
+
+// ═══════════════════════════════════════════════════════════════
+//  STORAGE
+// ═══════════════════════════════════════════════════════════════
+function ls(key, def='[]') {
+  try { return JSON.parse(localStorage.getItem(key) || def); } catch{ return JSON.parse(def); }
+}
+function lsSet(key, val) { localStorage.setItem(key, JSON.stringify(val)); }
+
+function loadAll() {
+  voters     = ls('coedah_voters');
+  candidates = ls('coedah_candidates');
+  sheetsURL  = localStorage.getItem('coedah_sheets_url') || '';
+  secciones  = ls('coedah_secciones', 'null');
+  if (!secciones || !Array.isArray(secciones)) {
+    secciones = DEFAULT_SECCIONES;
+    lsSet('coedah_secciones', secciones);
+  }
+}
+
+function saveVoters()     { lsSet('coedah_voters', voters); }
+function saveCandidates() { lsSet('coedah_candidates', candidates); }
+function saveSecciones()  { lsSet('coedah_secciones', secciones); }
+
+// ═══════════════════════════════════════════════════════════════
+//  UTILITIES
+// ═══════════════════════════════════════════════════════════════
+function fmtDate(d) {
+  if (!d) d = new Date();
+  const z = n => String(n).padStart(2,'0');
+  return `${z(d.getDate())}/${z(d.getMonth()+1)}/${d.getFullYear()} ${z(d.getHours())}:${z(d.getMinutes())}`;
+}
+
+function folio() {
+  return 'CDE-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).substring(2,5).toUpperCase();
+}
+
+function showMsg(id, txt, type) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.className = `msg ${type} show`;
+  el.textContent = txt;
+}
+function hideMsg(id) { const el=document.getElementById(id); if(el) el.className='msg'; }
+
+function stepSet(n, s) {
+  const el=document.getElementById('step'+n);
+  if(el) el.className='step '+(s||'');
+}
+
+// Build <select> for secciones in voting form
+function buildSeccionSelect() {
+  const sel = document.getElementById('seccion');
+  const groups = {};
+  secciones.forEach(s => {
+    const g = s.grupo || 'Otras';
+    if (!groups[g]) groups[g] = [];
+    groups[g].push(s.nombre);
+  });
+  let html = '<option value="">— Seleccionar —</option>';
+  Object.entries(groups).forEach(([g,items]) => {
+    html += `<optgroup label="${g}">`;
+    items.forEach(n => html += `<option value="${n}">${n}</option>`);
+    html += '</optgroup>';
+  });
+  sel.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  GOOGLE SHEETS
+// ═══════════════════════════════════════════════════════════════
+async function sendToSheets(data) {
+  const url = localStorage.getItem('coedah_sheets_url') || '';
+  if (!url || url.trim() === '') return false;
+  try {
+    const fd = new FormData();
+    Object.entries(data).forEach(([k,v]) => fd.append(k, v ?? ''));
+    const r = await fetch(url, { method:'POST', body:fd });
+    const j = await r.json();
+    return j.status === 'ok';
+  } catch(e) {
+    console.warn('Sheets error:', e);
+    return false;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  PASO 1 — REGISTRO
+// ═══════════════════════════════════════════════════════════════
+async function submitRegistro(e) {
+  e.preventDefault();
+  hideMsg('msg-registro');
+
+  const nombre  = document.getElementById('nombre_completo').value.trim();
+  const seccion = document.getElementById('seccion').value;
+  const nie     = document.getElementById('nie').value.trim();
+  const correo  = document.getElementById('correo').value.trim().toLowerCase();
+
+  // Validaciones básicas
+  if (nombre.split(' ').filter(Boolean).length < 2) {
+    showMsg('msg-registro','Ingresa tu nombre completo (nombre y apellido).','msg-error'); return;
+  }
+  if (!seccion) {
+    showMsg('msg-registro','Selecciona tu sección o año.','msg-error'); return;
+  }
+  if (!nie || nie.length < 3) {
+    showMsg('msg-registro','Ingresa un NIE válido.','msg-error'); return;
+  }
+  if (!correo.endsWith(EMAIL_DOMAIN)) {
+    showMsg('msg-registro',`Tu correo debe terminar en ${EMAIL_DOMAIN}`,'msg-error'); return;
+  }
+
+  // Verificar NIE duplicado
+  const dupNIE = voters.find(v => v.nie.trim().toLowerCase() === nie.trim().toLowerCase());
+  if (dupNIE) {
+    showMsg('msg-registro',
+      `⛔ El NIE "${nie}" ya emitió un voto el ${dupNIE.fecha_legible}. Si fue un error, contacta al administrador.`,
+      'msg-error'); return;
+  }
+
+  // Verificar correo duplicado
+  const dupEmail = voters.find(v => v.correo.trim().toLowerCase() === correo);
+  if (dupEmail) {
+    showMsg('msg-registro',
+      `⛔ El correo "${correo}" ya fue utilizado para votar el ${dupEmail.fecha_legible}. Si fue un error, contacta al administrador.`,
+      'msg-error'); return;
+  }
+
+  currentVoter = { nombre, seccion, nie, correo };
+  stepSet(1,'done'); stepSet(2,'active');
+  document.getElementById('paso1').style.display='none';
+  document.getElementById('paso2').style.display='block';
+  renderCandidates();
+}
+
+function backToPaso1() {
+  stepSet(2,''); stepSet(1,'active');
+  selectedCand = null;
+  document.getElementById('paso2').style.display='none';
+  document.getElementById('paso1').style.display='block';
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  PASO 2 — CANDIDATOS
+// ═══════════════════════════════════════════════════════════════
+function renderCandidates() {
+  const grid = document.getElementById('candidates-grid');
+  if (!candidates.length) {
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:30px;color:#888;">
+      <div style="font-size:2.5rem;margin-bottom:8px">🗳</div>
+      <div>No hay candidatos registrados aún.<br>El administrador debe agregarlos.</div></div>`;
+    return;
+  }
+  const total = voters.length || 1;
+  grid.innerHTML = candidates.map((c,i) => {
+    const votes = voters.filter(v => v.candidato === c.nombre).length;
+    const pct   = voters.length ? Math.round(votes/voters.length*100) : 0;
+    const img   = c.foto
+      ? `<img src="${c.foto}" alt="${c.nombre}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+      + `<div class="candidate-img-placeholder" style="display:none">🧑</div>`
+      : `<div class="candidate-img-placeholder">🧑</div>`;
+    return `
+      <div class="candidate-card" id="ccard-${i}" onclick="selectCand(${i})">
+        <div class="candidate-check">✓</div>
+        <div class="candidate-img-wrap">${img}</div>
+        <div class="candidate-name">${c.nombre}</div>
+        <div class="candidate-detail">${c.lema || 'Candidato CDE'}</div>
+        <div class="candidate-votes">🗳 ${votes} voto${votes!==1?'s':''} · ${pct}%</div>
+      </div>`;
+  }).join('');
+}
+
+function selectCand(i) {
+  document.querySelectorAll('.candidate-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('ccard-'+i).classList.add('selected');
+  selectedCand = candidates[i];
+  hideMsg('msg-candidatos');
+}
+
+function irAConfirmar() {
+  if (!selectedCand) { showMsg('msg-candidatos','Debes seleccionar un candidato para continuar.','msg-error'); return; }
+  stepSet(2,'done'); stepSet(3,'active');
+  document.getElementById('paso2').style.display='none';
+  document.getElementById('paso3').style.display='block';
+  renderConfirm();
+}
+
+function backToPaso2() {
+  stepSet(3,''); stepSet(2,'active');
+  document.getElementById('paso3').style.display='none';
+  document.getElementById('paso2').style.display='block';
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  PASO 3 — CONFIRMAR
+// ═══════════════════════════════════════════════════════════════
+function renderConfirm() {
+  const c = selectedCand, v = currentVoter;
+  const img = c.foto ? `<img src="${c.foto}" alt="${c.nombre}" onerror="this.outerHTML='<span>🧑</span>'">` : '<span>🧑</span>';
+  document.getElementById('confirm-receipt').innerHTML = `
+    <div class="receipt-header">
+      <span class="receipt-icon">📋</span>
+      <div><div class="receipt-title">Resumen de tu voto</div><div class="receipt-sub">Verifica que todos los datos sean correctos</div></div>
+    </div>
+    <div class="receipt-row"><span class="receipt-label">Nombre</span><span class="receipt-value">${v.nombre}</span></div>
+    <div class="receipt-row"><span class="receipt-label">Sección</span><span class="receipt-value">${v.seccion}</span></div>
+    <div class="receipt-row"><span class="receipt-label">NIE</span><span class="receipt-value">${v.nie}</span></div>
+    <div class="receipt-row"><span class="receipt-label">Correo</span><span class="receipt-value">${v.correo}</span></div>
+    <div class="receipt-candidate">
+      <div class="receipt-candidate-img">${img}</div>
+      <div><div class="receipt-candidate-name">${c.nombre}</div><div class="receipt-candidate-sub">${c.lema||'Candidato CDE Sector Alumnos'}</div></div>
+    </div>`;
+}
+
+async function confirmarVoto() {
+  const btn = document.getElementById('btn-confirmar');
+  btn.innerHTML = '<span class="spinner"></span> Registrando...';
+  btn.disabled = true;
+  hideMsg('msg-confirmar');
+  await new Promise(r => setTimeout(r, 800));
+
+  const now  = new Date();
+  const data = {
+    folio: folio(),
+    nombre: currentVoter.nombre,
+    seccion: currentVoter.seccion,
+    nie: currentVoter.nie,
+    correo: currentVoter.correo,
+    candidato: selectedCand.nombre,
+    candidato_lema: selectedCand.lema || '',
+    candidato_foto: selectedCand.foto || '',
+    timestamp: now.toISOString(),
+    fecha_legible: fmtDate(now),
+  };
+
+  voters.push(data);
+  saveVoters();
+  sendToSheets({ action:'votar', ...data });
+
+  stepSet(3,'done'); stepSet(4,'active');
+  document.getElementById('paso3').style.display='none';
+  document.getElementById('paso4').style.display='block';
+  document.getElementById('vote-folio').textContent = 'Folio: ' + data.folio;
+  renderReceiptPreview(data);
+  fillPDFTemplate(data);
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  PASO 4 — COMPROBANTE
+// ═══════════════════════════════════════════════════════════════
+function renderReceiptPreview(d) {
+  const c = selectedCand;
+  const img = c.foto
+    ? `<img src="${c.foto}" alt="${c.nombre}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.outerHTML='<span style=font-size:1.4rem>🧑</span>'">`
+    : `<span style="font-size:1.4rem">🧑</span>`;
+  document.getElementById('receipt-preview').innerHTML = `
+    <div class="receipt" style="margin:20px 0;">
+      <div class="receipt-header">
+        <span class="receipt-icon">🗳</span>
+        <div><div class="receipt-title">Comprobante de participación</div><div class="receipt-sub">Folio: ${d.folio} · ${d.fecha_legible}</div></div>
+      </div>
+      <div class="receipt-row"><span class="receipt-label">Votante</span><span class="receipt-value">${d.nombre}</span></div>
+      <div class="receipt-row"><span class="receipt-label">Sección</span><span class="receipt-value">${d.seccion}</span></div>
+      <div class="receipt-candidate">
+        <div class="receipt-candidate-img">${img}</div>
+        <div><div class="receipt-candidate-name">${c.nombre}</div><div class="receipt-candidate-sub">Tu voto ha sido emitido ✓</div></div>
+      </div>
+    </div>`;
+}
+
+function fillPDFTemplate(d) {
+  document.getElementById('pdf-nombre').textContent   = d.nombre;
+  document.getElementById('pdf-seccion').textContent  = d.seccion;
+  document.getElementById('pdf-nie').textContent      = d.nie;
+  document.getElementById('pdf-correo').textContent   = d.correo;
+  document.getElementById('pdf-fecha').textContent    = d.fecha_legible;
+  document.getElementById('pdf-cand-nombre').textContent = selectedCand.nombre;
+  document.getElementById('pdf-cand-lema').textContent   = selectedCand.lema || 'Candidato CDE';
+  document.getElementById('pdf-folio').textContent    = 'Folio: ' + d.folio;
+  const imgEl = document.getElementById('pdf-cand-img');
+  imgEl.innerHTML = selectedCand.foto
+    ? `<img src="${selectedCand.foto}" alt="" onerror="this.outerHTML='🧑'">`
+    : '🧑';
+}
+
+async function generarPDF() {
+  const btn = document.getElementById('btn-pdf');
+  btn.innerHTML = '<span class="spinner"></span> Generando PDF...';
+  btn.disabled = true;
+  try {
+    const {jsPDF} = window.jspdf;
+    const tpl = document.getElementById('pdf-receipt-tpl');
+    tpl.style.left = '0';
+    await new Promise(r => setTimeout(r, 300));
+    const canvas = await html2canvas(tpl, { scale:2, useCORS:true, backgroundColor:'#ffffff', logging:false });
+    const imgData = canvas.toDataURL('image/png', 1.0);
+    const pdf = new jsPDF('p','mm','a4');
+    const W = pdf.internal.pageSize.getWidth();
+    const H = pdf.internal.pageSize.getHeight();
+    const iW = W - 20;
+    const iH = (canvas.height * iW) / canvas.width;
+    pdf.addImage(imgData,'PNG',10,Math.max(10,(H-iH)/2),iW,iH);
+    const f = document.getElementById('pdf-folio').textContent.replace('Folio: ','');
+    pdf.save(`Comprobante_Voto_${f}.pdf`);
+    tpl.style.left = '-9999px';
+    btn.innerHTML = '✓ PDF descargado';
+    btn.style.background = '#1A6B3A';
+  } catch(err) {
+    console.error(err);
+    btn.innerHTML = '⬇ Descargar comprobante PDF';
+    btn.disabled = false;
+    alert('Error generando PDF. Intente de nuevo.');
+  }
+}
+
+function nuevoVoto() {
+  currentVoter = null; selectedCand = null;
+  document.getElementById('form-registro').reset();
+  [1,2,3,4].forEach(n => stepSet(n, n===1?'active':''));
+  ['paso2','paso3','paso4'].forEach(p => document.getElementById(p).style.display='none');
+  document.getElementById('paso1').style.display='block';
+  document.getElementById('candidates-grid').innerHTML='';
+  document.getElementById('receipt-preview').innerHTML='';
+  document.getElementById('confirm-receipt').innerHTML='';
+  ['msg-registro','msg-candidatos','msg-confirmar'].forEach(hideMsg);
+  const bpdf = document.getElementById('btn-pdf');
+  bpdf.innerHTML='⬇ Descargar comprobante PDF'; bpdf.disabled=false; bpdf.style.background='';
+  const bc = document.getElementById('btn-confirmar');
+  bc.innerHTML='✓ Confirmar voto definitivo'; bc.disabled=false;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  ADMIN — LOGIN
+// ═══════════════════════════════════════════════════════════════
+function openAdminLogin() {
+  document.getElementById('admin-login-overlay').classList.add('open');
+  document.getElementById('pw-input').value='';
+  document.getElementById('pw-error').classList.remove('show');
+  setTimeout(()=>document.getElementById('pw-input').focus(),100);
+}
+function closeAdminLogin() { document.getElementById('admin-login-overlay').classList.remove('open'); }
+function checkPassword() {
+  if (document.getElementById('pw-input').value === ADMIN_PASSWORD) {
+    closeAdminLogin(); openAdmin();
+  } else {
+    document.getElementById('pw-error').classList.add('show');
+    document.getElementById('pw-input').value='';
+    document.getElementById('pw-input').focus();
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  ADMIN — PANEL
+// ═══════════════════════════════════════════════════════════════
+function openAdmin() {
+  loadAll();
+  document.getElementById('admin-overlay').classList.add('open');
+  renderAdminData();
+  document.getElementById('sheets-url-input').value = localStorage.getItem('coedah_sheets_url') || '';
+  // Populate sheets URL input
+}
+function closeAdmin() { document.getElementById('admin-overlay').classList.remove('open'); }
+
+function switchTab(id, btn) {
+  document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.admin-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+
+function renderAdminData() {
+  loadAll();
+  renderAdminStats();
+  populateVoterFilters();
+  applyVoterFilter();
+  renderCandAdmin();
+  renderResults();
+  renderSeccionesAdmin();
+}
+
+// STATS
+function renderAdminStats() {
+  const votesByCand = {};
+  candidates.forEach(c => votesByCand[c.nombre]=0);
+  voters.forEach(v => { votesByCand[v.candidato] = (votesByCand[v.candidato]||0)+1; });
+  const leader = Object.entries(votesByCand).sort((a,b)=>b[1]-a[1])[0];
+  const secs   = new Set(voters.map(v=>v.seccion)).size;
+  document.getElementById('admin-stats-grid').innerHTML = `
+    <div class="admin-stat"><div class="admin-stat-val">${voters.length}</div><div class="admin-stat-lbl">Votos emitidos</div></div>
+    <div class="admin-stat"><div class="admin-stat-val">${candidates.length}</div><div class="admin-stat-lbl">Candidatos</div></div>
+    <div class="admin-stat"><div class="admin-stat-val">${secs}</div><div class="admin-stat-lbl">Secciones participantes</div></div>
+    <div class="admin-stat"><div class="admin-stat-val" style="font-size:0.95rem;color:var(--gold-light);">${leader?leader[0].split(' ')[0]:'—'}</div><div class="admin-stat-lbl">Candidato puntero</div></div>`;
+}
+
+// VOTER FILTERS
+function populateVoterFilters() {
+  const secs  = [...new Set(voters.map(v=>v.seccion))].sort();
+  const cands = [...new Set(voters.map(v=>v.candidato))].sort();
+  const secSel  = document.getElementById('v-filter-seccion');
+  const candSel = document.getElementById('v-filter-cand');
+  const prevSec  = secSel.value;
+  const prevCand = candSel.value;
+  secSel.innerHTML  = '<option value="">Todas las secciones</option>' + secs.map(s=>`<option value="${s}"${s===prevSec?'selected':''}>${s}</option>`).join('');
+  candSel.innerHTML = '<option value="">Todos los candidatos</option>' + cands.map(c=>`<option value="${c}"${c===prevCand?'selected':''}>${c}</option>`).join('');
+}
+
+function applyVoterFilter() {
+  const q    = (document.getElementById('v-search')?.value||'').toLowerCase().trim();
+  const sec  = document.getElementById('v-filter-seccion')?.value || '';
+  const cand = document.getElementById('v-filter-cand')?.value || '';
+
+  const list = voters.filter(v => {
+    const matchQ = !q || v.nombre.toLowerCase().includes(q) || v.nie.toLowerCase().includes(q) || v.correo.toLowerCase().includes(q);
+    const matchS = !sec  || v.seccion === sec;
+    const matchC = !cand || v.candidato === cand;
+    return matchQ && matchS && matchC;
+  });
+
+  document.getElementById('v-count').textContent = `${list.length} de ${voters.length} votante(s)`;
+  renderVoterRows(list);
+}
+
+function renderVoterRows(list) {
+  const tbody = document.getElementById('admin-voters-body');
+  if (!list.length) {
+    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;color:rgba(255,255,255,0.3);padding:28px;">Sin resultados para el filtro seleccionado.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = list.map((v,i) => `
+    <tr>
+      <td style="color:rgba(255,255,255,0.4)">${i+1}</td>
+      <td style="font-weight:600">${v.nombre}</td>
+      <td>${v.seccion}</td>
+      <td style="font-family:monospace;font-size:0.8rem">${v.nie}</td>
+      <td style="font-size:0.78rem">${v.correo}</td>
+      <td>${v.candidato||'—'}</td>
+      <td style="font-size:0.76rem;color:rgba(255,255,255,0.5)">${v.fecha_legible||'—'}</td>
+      <td><span class="voted-badge voted-yes">✓ Votó</span></td>
+      <td><button class="btn btn-danger btn-sm" style="padding:5px 10px;font-size:0.75rem" onclick="borrarVoto('${v.folio}','${v.nombre.replace(/'/g,"\\'")}')">🗑 Anular</button></td>
+    </tr>`).join('');
+}
+
+function borrarVoto(folioVal, nombre) {
+  if (!confirm(`¿Anular el voto de "${nombre}"?\n\nEsto eliminará su registro y podrá volver a votar. La acción queda en el log de auditoría.`)) return;
+  loadAll();
+  const idx = voters.findIndex(v => v.folio === folioVal);
+  if (idx === -1) { alert('Registro no encontrado.'); return; }
+
+  // Log auditoría
+  const anulados = ls('coedah_anulados');
+  anulados.push({ ...voters[idx], anulado_en: fmtDate(new Date()), anulado_por:'Administrador' });
+  lsSet('coedah_anulados', anulados);
+
+  // Enviar a Sheets
+  sendToSheets({ action:'anular', folio:voters[idx].folio, nombre:voters[idx].nombre, nie:voters[idx].nie, candidato:voters[idx].candidato });
+
+  voters.splice(idx, 1);
+  saveVoters();
+  renderAdminData();
+
+  const tbody = document.getElementById('admin-voters-body');
+  const row = document.createElement('tr');
+  row.innerHTML = `<td colspan="9" style="text-align:center;color:#6FCF97;padding:10px;font-size:0.85rem">✓ Voto de "${nombre}" anulado. El estudiante puede volver a votar.</td>`;
+  tbody.prepend(row);
+  setTimeout(()=>row.remove(), 4000);
+}
+
+// CANDIDATES ADMIN
+function renderCandAdmin() {
+  const grid = document.getElementById('cand-admin-grid');
+  const vbc  = {};
+  voters.forEach(v => { vbc[v.candidato]=(vbc[v.candidato]||0)+1; });
+  const total = voters.length || 1;
+
+  if (!candidates.length) {
+    grid.innerHTML = `<div style="grid-column:1/-1;color:rgba(255,255,255,0.35);font-size:0.85rem;padding:20px 0;">No hay candidatos registrados aún. Agrega el primero abajo.</div>`;
+    return;
+  }
+  grid.innerHTML = candidates.map((c,i) => {
+    const v   = vbc[c.nombre]||0;
+    const pct = voters.length ? Math.round(v/voters.length*100):0;
+    return `
+    <div class="cand-admin-card">
+      <button class="btn-del" onclick="eliminarCandidato(${i})" title="Eliminar candidato">✕</button>
+      <div class="cand-admin-img">${c.foto?`<img src="${c.foto}" alt="${c.nombre}" onerror="this.outerHTML='🧑'">`:'🧑'}</div>
+      <div class="cand-admin-name">${c.nombre}</div>
+      <div class="cand-admin-detail">${c.lema||'Sin lema'}</div>
+      <div class="cand-admin-votes">${v} votos</div>
+      <div class="cand-admin-votes-label">${pct}% del total</div>
+    </div>`;
+  }).join('');
+}
+
+function agregarCandidato() {
+  const nombre = document.getElementById('cand-nombre').value.trim();
+  const lema   = document.getElementById('cand-lema').value.trim();
+  const foto   = document.getElementById('cand-foto').value.trim();
+  if (!nombre) { showMsg('msg-cand-admin','El nombre del candidato es obligatorio.','msg-error'); return; }
+  if (candidates.some(c => c.nombre.toLowerCase()===nombre.toLowerCase())) {
+    showMsg('msg-cand-admin','Ya existe un candidato con ese nombre.','msg-error'); return;
+  }
+  candidates.push({ nombre, lema, foto });
+  saveCandidates();
+  document.getElementById('cand-nombre').value='';
+  document.getElementById('cand-lema').value='';
+  document.getElementById('cand-foto').value='';
+  showMsg('msg-cand-admin',`Candidato "${nombre}" agregado correctamente.`,'msg-success');
+  renderCandAdmin();
+}
+
+function eliminarCandidato(i) {
+  const c = candidates[i];
+  const votes = voters.filter(v=>v.candidato===c.nombre).length;
+  const warn  = votes>0 ? `\n⚠ Este candidato tiene ${votes} voto(s) registrado(s).` : '';
+  if (!confirm(`¿Eliminar al candidato "${c.nombre}"?${warn}`)) return;
+  candidates.splice(i,1);
+  saveCandidates();
+  renderCandAdmin();
+}
+
+// RESULTS
+function renderResults() {
+  const vbc = {};
+  candidates.forEach(c => vbc[c.nombre]=0);
+  voters.forEach(v => { if(!vbc.hasOwnProperty(v.candidato)) vbc[v.candidato]=0; vbc[v.candidato]++; });
+  const sorted = Object.entries(vbc).sort((a,b)=>b[1]-a[1]);
+  const total  = voters.length;
+  const container = document.getElementById('results-chart');
+  const bannerWrap = document.getElementById('winner-banner-wrap');
+
+  if (!sorted.length) {
+    bannerWrap.innerHTML='';
+    container.innerHTML=`<div class="empty-state"><div class="empty-icon">📊</div><div class="empty-text">No hay datos de votación todavía.</div></div>`;
+    return;
+  }
+
+  // Winner banner
+  if (total>0 && sorted.length>0) {
+    const [wName,wVotes] = sorted[0];
+    const wPct = Math.round(wVotes/total*100);
+    const wCand = candidates.find(c=>c.nombre===wName);
+    const wImg  = wCand?.foto ? `<img src="${wCand.foto}" alt="" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid var(--gold)" onerror="this.outerHTML='🏆'">` : '🏆';
+    bannerWrap.innerHTML=`
+      <div class="winner-banner">
+        <div class="winner-crown">${wImg}</div>
+        <div>
+          <div class="winner-info-label">Candidato con mayor votación</div>
+          <div class="winner-info-name">${wName}</div>
+          <div class="winner-info-sub">${wVotes} voto${wVotes!==1?'s':''} · ${wPct}% del total (${total} votos emitidos)</div>
+        </div>
+      </div>`;
+  } else { bannerWrap.innerHTML=''; }
+
+  container.innerHTML = sorted.map(([nombre,count],idx) => {
+    const pct = total>0 ? Math.round(count/total*100) : 0;
+    return `
+      <div class="result-bar-wrap">
+        <div class="result-bar-info">
+          <span class="result-bar-rank${idx===0?' first':''}">${idx+1}</span>
+          <span class="result-bar-name">${nombre}</span>
+          <span class="result-bar-count">${count} votos · ${pct}%</span>
+        </div>
+        <div class="result-bar-track">
+          <div class="result-bar-fill${idx===0?' first':''}" style="width:${pct}%"></div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// SECCIONES ADMIN
+function renderSeccionesAdmin() {
+  const container = document.getElementById('secciones-display');
+  const badge = document.getElementById('sec-total-badge');
+  if (badge) badge.textContent = secciones.length + ' sección' + (secciones.length!==1?'es':'');
+  if (!secciones.length) {
+    container.innerHTML='<div style="color:rgba(255,255,255,0.35);font-size:0.85rem;padding:12px 0;">No hay secciones. Agrega una arriba.</div>';
+    renderGroupButtons(); return;
+  }
+  const groups = {};
+  secciones.forEach((s,i) => {
+    const g = s.grupo||'Otras';
+    if (!groups[g]) groups[g]=[];
+    groups[g].push({...s, _idx:i});
+  });
+  let html='';
+  Object.entries(groups).forEach(([g,items]) => {
+    html+=`<div class="sec-group-block"><div class="sec-group-title">${g} <span style="color:var(--gold-light);font-size:0.7rem;">(${items.length})</span></div><div class="sec-chips">`;
+    items.forEach(s=>{
+      html+=`<span class="sec-chip">${s.nombre}<button class="sec-chip-del" onclick="eliminarSeccion(${s._idx})" title="Quitar ${s.nombre}">✕</button></span>`;
+    });
+    html+='</div></div>';
+  });
+  container.innerHTML=html;
+  renderGroupButtons();
+}
+
+function renderGroupButtons() {
+  const wrap = document.getElementById('sec-qa-group-btns');
+  if (!wrap) return;
+  const defaults = ['Básica — 3er Ciclo','Bachillerato — 1er Año','Bachillerato — 2do Año','Bachillerato — 3er Año'];
+  const existing = [...new Set(secciones.map(s=>s.grupo||'Otras'))];
+  const all = [...new Set([...defaults,...existing])];
+  const curSel = wrap.querySelector('.sel')?.dataset?.g || all[0];
+  wrap.innerHTML = all.map(g=>`<button class="sec-qa-group-btn${g===curSel?' sel':''}" data-g="${g}" onclick="selectGroup(this)">${g}</button>`).join('');
+}
+
+function selectGroup(btn) {
+  document.querySelectorAll('.sec-qa-group-btn').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+  livePreviewSeccion(document.getElementById('nueva-seccion').value);
+}
+
+function getSelectedGroup() {
+  const sel = document.querySelector('.sec-qa-group-btn.sel');
+  return sel ? sel.dataset.g : (document.querySelector('.sec-qa-group-btn')?.dataset.g || 'Otras');
+}
+
+function livePreviewSeccion(val) {
+  const prev = document.getElementById('sec-qa-preview');
+  if (!prev) return;
+  const v = val.trim();
+  if (!v) { prev.style.display='none'; return; }
+  prev.style.display='inline-block';
+  prev.textContent = `"${v}" en → ${getSelectedGroup()}`;
+}
+
+function quickAddSeccion() {
+  const input = document.getElementById('nueva-seccion');
+  const nombre = input.value.trim();
+  const grupo = getSelectedGroup();
+  if (!nombre) { showMsg('msg-secciones','Escribe el nombre de la sección primero.','msg-error'); return; }
+  if (secciones.some(s=>s.nombre.toLowerCase()===nombre.toLowerCase())) {
+    showMsg('msg-secciones',`La sección "${nombre}" ya existe.`,'msg-error'); return;
+  }
+  secciones.push({ grupo, nombre });
+  saveSecciones(); buildSeccionSelect(); renderSeccionesAdmin();
+  input.value='';
+  const prev = document.getElementById('sec-qa-preview');
+  if (prev) prev.style.display='none';
+  showMsg('msg-secciones',`✓ "${nombre}" agregada al grupo "${grupo}".`,'msg-success');
+  input.focus();
+}
+
+function batchAdd(grupo, nombres) {
+  let added=0;
+  nombres.forEach(nombre=>{
+    if(!secciones.some(s=>s.nombre===nombre)){ secciones.push({grupo,nombre}); added++; }
+  });
+  if(added>0){ saveSecciones(); buildSeccionSelect(); renderSeccionesAdmin(); showMsg('msg-secciones',`✓ ${added} sección(es) agregadas a "${grupo}".`,'msg-success'); }
+  else showMsg('msg-secciones','Todas esas secciones ya existen.','msg-info');
+}
+
+function batchAddRange(grupo, prefix, from, to) {
+  batchAdd(grupo, [...Array(to-from+1)].map((_,i)=>prefix+(from+i)));
+}
+
+
+
+function eliminarSeccion(i) {
+  if (!confirm(`¿Eliminar la sección "${secciones[i].nombre}"?`)) return;
+  secciones.splice(i,1);
+  saveSecciones();
+  buildSeccionSelect();
+  renderSeccionesAdmin();
+}
+
+function resetSecciones() {
+  if (!confirm('¿Restaurar todas las secciones a los valores por defecto? Esto reemplazará los cambios actuales.')) return;
+  secciones = [...DEFAULT_SECCIONES];
+  saveSecciones();
+  buildSeccionSelect();
+  renderSeccionesAdmin();
+  showMsg('msg-secciones','Secciones restauradas a los valores por defecto.','msg-success');
+}
+
+// SHEETS CONFIG
+function guardarSheetsURL() {
+  const url = document.getElementById('sheets-url-input').value.trim();
+  localStorage.setItem('coedah_sheets_url', url);
+  showMsg('msg-sheets', url ? '✓ URL guardada. Los votos se enviarán a Google Sheets.' : 'URL eliminada. Los votos se guardarán solo localmente.', url ? 'msg-success' : 'msg-info');
+}
+
+async function testSheetsConnection() {
+  const url = document.getElementById('sheets-url-input').value.trim();
+  if (!url) { showMsg('msg-sheets','Pega primero la URL del Web App.','msg-error'); return; }
+  showMsg('msg-sheets','Probando conexión…','msg-info');
+  try {
+    const r = await fetch(url);
+    const j = await r.json();
+    if (j.status==='ok') showMsg('msg-sheets','✓ Conexión exitosa: ' + j.msg,'msg-success');
+    else showMsg('msg-sheets','Respuesta recibida con error: '+j.msg,'msg-error');
+  } catch(e) {
+    showMsg('msg-sheets','✗ No se pudo conectar. Verifica la URL y los permisos (Acceso: Cualquier persona).','msg-error');
+  }
+}
+
+// EXPORT CSV
+function exportarCSV() {
+  if (!voters.length) { alert('No hay votantes registrados.'); return; }
+  const headers = ['#','Nombre Completo','Sección/Año','NIE','Correo','Candidato Votado','Fecha/Hora','Folio'];
+  const rows    = voters.map((v,i)=>[i+1,v.nombre,v.seccion,v.nie,v.correo,v.candidato,v.fecha_legible,v.folio]);
+  const csv = [headers,...rows].map(r=>r.map(c=>`"${String(c||'').replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+  const a = document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`Votantes_CDE_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+}
+
+// EXPORT RESULTS PDF
+async function exportarResultadosPDF() {
+  const vbc={};
+  candidates.forEach(c=>vbc[c.nombre]=0);
+  voters.forEach(v=>{if(!vbc.hasOwnProperty(v.candidato))vbc[v.candidato]=0;vbc[v.candidato]++;});
+  const sorted=Object.entries(vbc).sort((a,b)=>b[1]-a[1]);
+  const total=voters.length;
+  const {jsPDF}=window.jspdf;
+  const pdf=new jsPDF('p','mm','a4');
+  const W=pdf.internal.pageSize.getWidth();
+  pdf.setFillColor(26,58,92);pdf.rect(0,0,W,42,'F');
+  pdf.setTextColor(200,151,42);pdf.setFontSize(15);pdf.setFont('helvetica','bold');
+  pdf.text('COED Alejandro de Humboldt',W/2,15,{align:'center'});
+  pdf.setFontSize(10);pdf.setTextColor(220,200,150);
+  pdf.text('Resultados — Proceso Electoral CDE Sector Alumnos',W/2,25,{align:'center'});
+  pdf.text(`Generado: ${fmtDate(new Date())}`,W/2,34,{align:'center'});
+  let y=55;
+  pdf.setTextColor(13,27,42);pdf.setFontSize(11);pdf.setFont('helvetica','bold');
+  pdf.text(`Total votos: ${total}   Candidatos: ${candidates.length}`,14,y);y+=12;
+  pdf.setDrawColor(200,151,42);pdf.line(14,y,W-14,y);y+=8;
+  pdf.setFontSize(10);pdf.text('Resultados por candidato:',14,y);y+=10;
+  sorted.forEach(([n,c],idx)=>{
+    const pct=total>0?Math.round(c/total*100):0;
+    pdf.setFont('helvetica','bold');pdf.setFontSize(10);
+    pdf.setTextColor(idx===0?200:13,idx===0?151:27,idx===0?42:42);
+    pdf.text(`${idx+1}. ${n}`,14,y);
+    pdf.setTextColor(13,27,42);pdf.setFont('helvetica','normal');
+    pdf.text(`${c} votos — ${pct}%`,W-14,y,{align:'right'});y+=6;
+    pdf.setFillColor(idx===0?200:37,idx===0?151:99,idx===0?42:168);
+    pdf.rect(14,y,Math.max(1,(W-28)*pct/100),4,'F');
+    pdf.setDrawColor(220,220,220);pdf.rect(14,y,W-28,4,'S');y+=12;
+  });
+  if(sorted.length&&total>0){
+    y+=4;pdf.setDrawColor(200,151,42);pdf.line(14,y,W-14,y);y+=8;
+    pdf.setFont('helvetica','bold');pdf.setFontSize(12);pdf.setTextColor(26,58,92);
+    pdf.text(`Candidato ganador: ${sorted[0][0]}`,14,y);y+=6;
+    pdf.setFont('helvetica','normal');pdf.setFontSize(9);pdf.setTextColor(100,100,100);
+    pdf.text(`${sorted[0][1]} voto(s) — ${Math.round(sorted[0][1]/total*100)}% del total`,14,y);
+  }
+  pdf.save(`Resultados_CDE_${new Date().toISOString().slice(0,10)}.pdf`);
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+  loadAll();
+  buildSeccionSelect();
+  document.getElementById('pw-input').addEventListener('keydown', e => { if(e.key==='Enter') checkPassword(); });
+
+});
+</script>
+</body>
+</html>
