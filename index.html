@@ -697,7 +697,9 @@ function buildSeccionSelect() {
 //  GOOGLE SHEETS
 // ═══════════════════════════════════════════════════════════════
 async function sendToSheets(data) {
-  const url = localStorage.getItem('coedah_sheets_url') || '';
+  const DEFAULT_URL = "https://script.google.com/macros/s/AKfycbxqrruoFdl1Z55Cj54KbfQNcX6Oh6AQVejjAkRZteG0InSVfcOKDWlBNE5JACDzZGPmXw/exec";
+  
+  const url = localStorage.getItem('coedah_sheets_url') || DEFAULT_URL;
   if (!url || url.trim() === '') return false;
   try {
     const fd = new FormData();
